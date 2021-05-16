@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +26,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     };
     private final static int REQ_PERMISSIONS = 1234;
 
+    private Button button;
     private TextView infoView;
     private GoogleMap map;
 
@@ -40,12 +45,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LocationRequest request;
     private LocationCallback callback;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
 
+        button = findViewById(R.id.button);
         infoView = findViewById(R.id.info_view);
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         if (fragment != null) {
@@ -56,8 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationClient = LocationServices.getFusedLocationProviderClient(this);
 
         request = LocationRequest.create();
-        request.setInterval(10000L);
-        request.setFastestInterval(5000L);
+
         request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
         callback = new LocationCallback() {
@@ -74,6 +81,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 map.animateCamera(CameraUpdateFactory.newLatLng(ll));
             }
         };
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Location update");
+                request = new LocationRequest();
+                request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                request.setExpirationDuration(1000L);
+                locationClient.requestLocationUpdates(request, callback, null);
+            }
+        });
     }
 
     @Override
